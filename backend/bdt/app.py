@@ -12,7 +12,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 import numpy as np
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
 from fastapi.responses import FileResponse
@@ -26,13 +26,26 @@ from .engines.cluster import heating_rate_1c, load_fleet, run_clustering, save_f
 from .engines.gate import run_gate
 from .engines.safefit import run_safefit
 from .engines.twin import DEFAULT_UNCERTAINTY, run_twin
-from .hw.link import AUDIT, REC_DIR, DATA_DIR, Link, ReplayLink, SerialLink, VirtualLink, list_ports, sniff
+from .hw.link import AUDIT, REC_DIR, DATA_DIR, Link, ReplayLink, SerialLink, VirtualLink, find_port, list_ports, sniff
 from .hw.protocols import DalyCodec, JbdCodec, ModbusCodec, make_codec
 from .model.chem import LFP
 from .model.estimator import Estimator
 from .model.vehicle import CYCLES, PRESETS, Vehicle, adapt_cycle, cycle_from_csv, make_cycle, mission_requirements
 
 VEH_FILE = DATA_DIR / "vehicles.json"
+PROFILE_FILE = DATA_DIR / "link_profile.json"   # remembered adapter + protocol + nameplate (auto-reconnect)
+
+
+def _local_only(request: Request):
+    """BMS writes are allowed only from this PC, even when the UI is shared on the LAN (there is no login)."""
+    host = request.client.host if request.client else ""
+    fwd = request.headers.get("x-forwarded-for")
+    if fwd:  # via the UI proxy: the LAST entry is appended by the proxy itself and cannot be forged
+        host = fwd.split(",")[-1].strip()
+    if host.startswith("::ffff:"):
+        host = host[7:]
+    if host not in ("127.0.0.1", "::1", "localhost"):
+        raise HTTPException(403, "BMS writes are only allowed from the PC the battery is plugged into")
 
 
 def _clean(o):
@@ -184,6 +197,71 @@ wb = Workbench()
 app = FastAPI(title="Battery R&D Workbench")
 
 
+# ======================================================================== adapter memory + auto-reconnect
+def load_profile():
+    try:
+        return json.loads(PROFILE_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def save_profile(p):
+    PROFILE_FILE.write_text(json.dumps(p, indent=1), encoding="utf-8")
+
+
+def _open_serial(params: dict, port: str):
+    codec = make_codec(params["protocol"], slave=params.get("slave", 1), reg_map=_load_modbus_map())
+    codec.invert_current = params.get("invert_current", False)
+    return SerialLink(port, params["baud"], codec, poll_hz=params.get("poll_hz", 1.0))
+
+
+class Watchdog:
+    """Every 2 s: if the adapter vanished, drop the link; if the remembered adapter is present
+    (under whatever COM name it has now) and nothing is connected, reconnect."""
+
+    def __init__(self):
+        self.state = "idle"
+        self.last_msg = ""
+        threading.Thread(target=self._run, daemon=True).start()
+
+    def _run(self):
+        while True:
+            time.sleep(2.0)
+            try:
+                self.tick()
+            except Exception as e:
+                self.last_msg = f"watchdog: {e}"
+
+    def tick(self):
+        prof = load_profile()
+        link = wb.link
+        if isinstance(link, SerialLink) and getattr(link, "lost", False):
+            link.stop()
+            wb.link = None
+            self.state, self.last_msg = "lost", f"adapter on {link.port} disconnected; waiting for it to come back"
+            link = None
+        if link is not None or not prof or not prof.get("auto", True):
+            if link is not None:
+                self.state = "connected"
+            return
+        port = find_port(prof["adapter"])
+        if not port:
+            self.state = "waiting"
+            self.last_msg = f"waiting for adapter {prof['adapter'].get('vid')}:{prof['adapter'].get('pid')}"
+            return
+        try:
+            link = _open_serial(prof["params"], port)
+        except Exception as e:
+            self.state, self.last_msg = "retrying", f"{port}: {e}"
+            return
+        wb.meta.update(prof.get("meta", {}))
+        wb.attach(link)
+        self.state, self.last_msg = "connected", f"reconnected on {port}"
+
+
+watchdog = Watchdog()
+
+
 # ======================================================================== link API
 class OpenReq(BaseModel):
     port: str
@@ -211,20 +289,59 @@ def link_demo(speed: float = 8.0, series: int = 4):
 
 @app.post("/api/link/open")
 def link_open(r: OpenReq):
-    codec = make_codec(r.protocol, slave=r.slave, reg_map=_load_modbus_map())
-    codec.invert_current = r.invert_current
+    params = {"baud": r.baud, "protocol": r.protocol, "slave": r.slave, "poll_hz": r.poll_hz,
+              "invert_current": r.invert_current}
+    if wb.link:
+        wb.link.stop()
+        wb.link = None
     try:
-        link = SerialLink(r.port, r.baud, codec, poll_hz=r.poll_hz)
+        link = _open_serial(params, r.port)
     except Exception as e:
         raise HTTPException(400, f"cannot open {r.port}: {e}")
-    wb.meta.update({"label": f"{r.protocol.upper()} battery on {r.port}", "i_max_dis": None, "i_max_chg": None,
-                    "mass_kg": 0.0, "nominal_user": False})
+    prev = load_profile()
+    port_info = next((p for p in list_ports() if p["device"] == r.port), {"device": r.port})
+    adapter = {"vid": port_info.get("vid"), "pid": port_info.get("pid"), "serial": port_info.get("serial"),
+               "location": port_info.get("location"), "port": r.port, "chip": port_info.get("chip")}
+    same = prev and prev.get("adapter", {}).get("vid") == adapter["vid"] and prev.get("params", {}).get("protocol") == r.protocol
+    if same and prev.get("meta"):
+        wb.meta.update(prev["meta"])       # same battery setup: keep the nameplate the user entered
+    else:
+        wb.meta.update({"label": f"{r.protocol.upper()} battery", "i_max_dis": None, "i_max_chg": None,
+                        "mass_kg": 0.0, "nominal_user": False})
     wb.attach(link)
+    save_profile({"adapter": adapter, "params": params, "meta": wb.meta, "auto": True, "saved": time.time()})
     return link.status()
+
+
+@app.get("/api/link/profile")
+def link_profile():
+    prof = load_profile()
+    return {"profile": prof, "watchdog": {"state": watchdog.state, "message": watchdog.last_msg},
+            "resolved_port": find_port(prof["adapter"]) if prof else None}
+
+
+@app.post("/api/link/profile/auto")
+def link_profile_auto(on: bool):
+    prof = load_profile()
+    if not prof:
+        raise HTTPException(404, "no remembered adapter yet - connect once from Hardware")
+    prof["auto"] = on
+    save_profile(prof)
+    return link_profile()
+
+
+@app.delete("/api/link/profile")
+def link_profile_forget():
+    PROFILE_FILE.unlink(missing_ok=True)
+    return {"ok": True}
 
 
 @app.post("/api/link/close")
 def link_close():
+    prof = load_profile()
+    if prof and isinstance(wb.link, SerialLink):  # a deliberate disconnect must not be undone by the watchdog
+        prof["auto"] = False
+        save_profile(prof)
     if wb.link:
         wb.link.stop()
     wb.link = None
@@ -267,7 +384,8 @@ def frames(since: int = 0, limit: int = 300):
 
 
 @app.post("/api/link/arm")
-def arm(on: bool):
+def arm(on: bool, request: Request):
+    _local_only(request)
     wb.writes_armed = on
     return {"armed": on}
 
@@ -278,7 +396,8 @@ class RawReq(BaseModel):
 
 
 @app.post("/api/link/raw")
-def raw(r: RawReq):
+def raw(r: RawReq, request: Request):
+    _local_only(request)
     if not wb.link:
         raise HTTPException(409, "no link")
     if not wb.writes_armed:
@@ -297,7 +416,8 @@ def raw(r: RawReq):
 
 
 @app.post("/api/link/cmd")
-def cmd(name: str):
+def cmd(name: str, request: Request):
+    _local_only(request)
     if not wb.link:
         raise HTTPException(409, "no link")
     if not wb.writes_armed:
@@ -380,6 +500,10 @@ def set_meta(m: dict):
     if "nominal_Ah" in m:
         m["nominal_user"] = True
     wb.meta.update(m)
+    prof = load_profile()
+    if prof and isinstance(wb.link, SerialLink):
+        prof["meta"] = wb.meta
+        save_profile(prof)
     wb.est.nominal_Ah = float(wb.meta.get("nominal_Ah", 100.0))
     wb.est.i_max_dis = wb.meta.get("i_max_dis")
     return wb.meta
@@ -626,6 +750,7 @@ async def ws(sock: WebSocket):
             card = wb.refresh_card()
             st = wb.link.status() if wb.link else {"kind": "none"}
             tw = wb.twin.latest
+            st = {**st, "watchdog": watchdog.state, "watchdog_msg": watchdog.last_msg}
             payload = {"t": time.time(), "link": st, "battery": card,
                        "twin": {"latest": tw, "fidelity": wb.twin.fidelity()} if tw else None,
                        "log": {"name": wb.logger.name, "rows": wb.logger.rows} if wb.logger else None,

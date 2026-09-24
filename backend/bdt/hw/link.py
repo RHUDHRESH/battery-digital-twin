@@ -27,9 +27,33 @@ def list_ports():
         out.append({
             "device": p.device, "description": p.description, "hwid": p.hwid,
             "vid": f"{p.vid:04X}" if p.vid else None, "pid": f"{p.pid:04X}" if p.pid else None,
+            "serial": p.serial_number or None, "location": p.location or None,
             "chip": _chip(p.vid, p.pid, p.description or ""),
+            "likely_rs485": bool(p.vid) and "bluetooth" not in (p.description or "").lower(),
         })
-    return out
+    # USB serial adapters first, Bluetooth/virtual ports last
+    return sorted(out, key=lambda p: (not p["likely_rs485"], p["device"]))
+
+
+def find_port(identity: dict) -> str | None:
+    """Resolve a remembered adapter to its CURRENT COM/tty name.
+
+    COM numbers differ between PCs and USB sockets, so the adapter is matched by
+    USB VID:PID (+ serial number when the chip has one; CH340s usually don't).
+    With several identical serial-less adapters, prefer the same USB location,
+    then the same port name."""
+    if not identity or not identity.get("vid"):
+        return identity.get("port") if identity else None
+    cands = [p for p in list_ports() if p["vid"] == identity["vid"] and p["pid"] == identity["pid"]]
+    if identity.get("serial"):
+        cands = [p for p in cands if p["serial"] == identity["serial"]] or cands
+    if not cands:
+        return None
+    for field, remembered in (("location", identity.get("location")), ("device", identity.get("port"))):
+        same = [p for p in cands if remembered and p[field] == remembered]
+        if same:
+            return same[0]["device"]
+    return cands[0]["device"]
 
 
 def _chip(vid, pid, desc):
@@ -164,6 +188,7 @@ class SerialLink(Link):
         import serial
         self.ser = serial.Serial(port, baud, timeout=0.05, parity=parity, stopbits=stopbits)
         self.port, self.baud = port, baud
+        self.lost = False
         # half-duplex: wait for the longest expected reply (~80 bytes, 10 bits/byte) plus BMS turnaround
         # before the next request, or the next request collides with the reply on the bus
         self.inter_frame_s = 80 * 10 / baud + 0.06
@@ -184,6 +209,7 @@ class SerialLink(Link):
                     self._rx(data)
             except Exception as e:
                 self.error = str(e)
+                self.lost = True   # adapter unplugged / port vanished: the watchdog reconnects
                 time.sleep(0.5)
 
     def stop(self):

@@ -19,15 +19,22 @@ cd frontend && npm install
 ## Run it
 
 ```powershell
-./start.ps1          # engine on :8000, UI on :5173, opens the browser
+./start.ps1          # Windows: engine + UI, opens http://localhost:5173
+./start.ps1 -Lan     # also let other PCs on your network open it (view only, see below)
 ```
-
-To run the two parts by hand:
 
 ```bash
-cd frontend && npm run engine    # FastAPI analysis engine (Python venv in backend/.venv)
-cd frontend && npm run dev       # UI at http://localhost:5173
+./start.sh           # Linux / macOS   (./start.sh --lan for LAN mode)
 ```
+
+To run the two parts by hand: `npm --prefix frontend run engine` and `npm --prefix frontend run dev`.
+
+## Other PCs and COM ports
+
+- **Any PC, any COM number.** The first time you press **Connect**, the workbench remembers the adapter by its USB ID (VID:PID, plus serial number or USB socket when available), with the protocol, baud rate and nameplate. It then finds the adapter again under whatever COM or tty name the operating system gives it, reconnects on startup, and reconnects after an unplug and replug. You can change or forget this in Hardware under **Remembered adapter**. Pressing Disconnect turns auto-reconnect off until you connect again.
+- **Port list.** Real USB-serial adapters (CH340, FTDI, CP210x, PL2303) are listed first. Bluetooth serial ports are labelled as not RS485.
+- **Linux:** add your user to the `dialout` group to use serial ports. Ports appear as `/dev/ttyUSB0` and similar.
+- **LAN mode** (`-Lan` / `--lan`): other PCs open `http://<this-PC-IP>:5173` and see everything live. The engine itself still listens only on this PC, and **writing to the BMS (arm, raw frames, MOSFET commands) is refused for any request that doesn't come from this PC**, because there's no login. Windows Firewall may ask to allow Node.js the first time.
 
 ## Connect your RS485 battery
 

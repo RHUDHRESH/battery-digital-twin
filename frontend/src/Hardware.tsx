@@ -14,6 +14,8 @@ export default function Hardware({ say, live }: { say: (m: string) => void; live
   const [meta, setMeta] = useState<Any>({})
   const [map, setMap] = useState('[]')
   const [audit, setAudit] = useState<Any[]>([])
+  const [prof, setProf] = useState<Any | null>(null)
+  const remote = !['localhost', '127.0.0.1', '::1', '[::1]'].includes(location.hostname)
   const seq = useRef(0)
   const box = useRef<HTMLDivElement>(null)
   const link = live?.link ?? {}
@@ -22,6 +24,7 @@ export default function Hardware({ say, live }: { say: (m: string) => void; live
     const p = await api.get('/api/ports'); setPorts(p)
     if (!form.port && p.length) setForm((f) => ({ ...f, port: p[0].device }))
     setRecs(await api.get('/api/record/list'))
+    setProf(await api.get('/api/link/profile'))
     setAudit(await api.get('/api/link/audit'))
   }
   useEffect(() => {
@@ -105,7 +108,24 @@ export default function Hardware({ say, live }: { say: (m: string) => void; live
         </div>
 
         <div className="panel">
-          <div className="section-head"><h3>Link</h3>
+          <div className="section-head"><h3>Remembered adapter</h3>
+            {prof?.profile && <span className="label">{prof.watchdog.state}</span>}</div>
+          {prof?.profile ? (
+            <>
+              <p className="hint" style={{ margin: '0 0 6px' }}>
+                {prof.profile.adapter.chip ?? 'USB serial'} ({prof.profile.adapter.vid}:{prof.profile.adapter.pid}), {prof.profile.params.protocol.toUpperCase()} at {prof.profile.params.baud} baud.
+                Found by USB ID, not COM number, so it works on any PC or USB socket.
+                {prof.resolved_port ? ` Right now it is ${prof.resolved_port}.` : ' Not plugged in right now.'}
+                {prof.watchdog.message && ` ${prof.watchdog.message}.`}
+              </p>
+              <div className="row">
+                <label className="row" style={{ gap: 6 }}><input type="checkbox" checked={prof.profile.auto !== false}
+                  onChange={async (e) => setProf(await api.post(`/api/link/profile/auto?on=${e.target.checked}`))} /> Reconnect automatically</label>
+                <button className="btn" onClick={async () => { await fetch('/api/link/profile', { method: 'DELETE' }); refresh(); say('Adapter forgotten') }}>Forget</button>
+              </div>
+            </>
+          ) : <p className="hint" style={{ margin: 0 }}>Connect once and the workbench remembers the adapter and protocol, then reconnects by itself, even when Windows gives it a different COM number.</p>}
+          <div className="section-head" style={{ marginTop: 16 }}><h3>Link</h3>
             <span className="label">{link.kind ?? 'none'} {link.port ?? ''} {link.baud ? `@ ${link.baud}` : ''}</span></div>
           <table className="t"><tbody>
             <tr><td className="label">Status</td><td>{link.running ? 'running' : 'stopped'}{link.error && <span style={{ color: 'var(--fail)' }}>: {link.error}</span>}</td></tr>
@@ -149,9 +169,10 @@ export default function Hardware({ say, live }: { say: (m: string) => void; live
         </div>
         <div className="panel">
           <div className="section-head"><h3>Write to the BMS</h3>
-            <label className="row" style={{ gap: 6 }}><input type="checkbox" checked={armed} onChange={(e) => { setArmed(e.target.checked); api.post(`/api/link/arm?on=${e.target.checked}`) }} />
+            <label className="row" style={{ gap: 6 }}><input type="checkbox" checked={armed} disabled={remote} onChange={(e) => { setArmed(e.target.checked); api.post(`/api/link/arm?on=${e.target.checked}`) }} />
               <b style={{ color: armed ? 'var(--fail)' : 'var(--ink-2)' }}>{armed ? 'Writes armed' : 'Writes disarmed'}</b></label></div>
           <p className="hint">Raw writes can change protection settings or disable the BMS. Every write is logged to data/write_audit.jsonl.</p>
+          {remote && <div className="warnbox" style={{ marginBottom: 8 }}>You're viewing from another PC. Writing to the BMS only works on the PC the battery is plugged into.</div>}
           <div className="row">
             {['charge_mos_on', 'charge_mos_off', 'discharge_mos_on', 'discharge_mos_off'].map((c) => (
               <button key={c} className={`btn ${c.endsWith('off') ? 'danger' : ''}`} disabled={!armed} onClick={() => run(() => api.post(`/api/link/cmd?name=${c}`), `Sent ${c.replace(/_/g, ' ')}`)}>

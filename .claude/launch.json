@@ -1,17 +1,7 @@
 {
   "version": "0.0.1",
   "configurations": [
-    {
-      "name": "engine",
-      "runtimeExecutable": "backend/.venv/Scripts/python.exe",
-      "runtimeArgs": ["-m", "uvicorn", "bdt.app:app", "--app-dir", "backend", "--port", "8000"],
-      "port": 8000
-    },
-    {
-      "name": "workbench",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "frontend", "run", "dev"],
-      "port": 5173
-    }
+    { "name": "engine", "runtimeExecutable": "node", "runtimeArgs": ["scripts/engine.mjs"], "port": 8000 },
+    { "name": "workbench", "runtimeExecutable": "npm", "runtimeArgs": ["--prefix", "frontend", "run", "dev"], "port": 5173 }
   ]
 }

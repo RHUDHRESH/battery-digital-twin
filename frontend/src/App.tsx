@@ -114,7 +114,9 @@ export default function App() {
       <header className="topbar">
         <div className="brand">
           <b>Battery Workbench</b>
-          <span className="hint">{wsUp ? (link?.kind && link.kind !== 'none' ? `${link.kind} · ${link.codec ?? ''}` : 'no battery connected') : 'engine offline'}</span>
+          <span className="hint">{!wsUp ? 'engine offline'
+            : link?.kind && link.kind !== 'none' ? `${link.kind === 'rs485' ? `RS485 ${link.port ?? ''}` : link.kind} · ${link.codec ?? ''}`
+              : link?.watchdog === 'waiting' ? 'waiting for the adapter…' : link?.watchdog === 'lost' ? 'adapter unplugged, will reconnect' : 'no battery connected'}</span>
         </div>
         <div className="cards">
           <button className="idcard" onClick={() => setDrawer('evidence')} title="Battery evidence">

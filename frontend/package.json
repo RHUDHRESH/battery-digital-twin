@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "engine": "cd .. && backend/.venv/Scripts/python -m uvicorn bdt.app:app --app-dir backend --port 8000"
+    "engine": "node ../scripts/engine.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",
