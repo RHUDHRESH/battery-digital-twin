@@ -1,0 +1,211 @@
+[
+  {
+    "id": 1,
+    "status": "PARTIAL",
+    "title": "State-of-health estimation of lithium-ion batteries: A comprehensive literature review from cell to pack levels",
+    "authors": "Su, L.; Xu, Y.; Dong, Z. Y.",
+    "venue": "Energy Conversion and Economics 5(4):224-242",
+    "year": 2024,
+    "url": "https://doi.org/10.1049/enc2.12125",
+    "claim": "Review of Li-ion SOH estimation at cell, module and pack levels. It defines SOH using resistance, capacity and energy indices at each level, compares them on modelling complexity, measurement time and accuracy, and classifies methods as direct measurement, model-based, data-driven or hybrid.",
+    "note": "Metadata and abstract checked via Crossref and OpenAlex. Capacity, resistance and energy are supported by the abstract. Temperature and pack inconsistency as SOH inputs are NOT in the abstract. The full text (CC BY-NC-ND) returned HTTP 403, so that part is unchecked."
+  },
+  {
+    "id": 2,
+    "status": "VERIFIED",
+    "title": "UL 1974 - Evaluation for Repurposing or Remanufacturing Batteries",
+    "authors": "UL (standard; no personal authors)",
+    "venue": "UL Standard, Edition 2",
+    "year": 2023,
+    "url": "https://www.shopulstandards.com/ProductDetail.aspx?productId=UL1974",
+    "claim": "UL 1974 covers the sorting and grading process of battery packs, modules, cells and electrochemical capacitors originally used for other purposes (e.g. EV propulsion) and intended for a repurposed use (Scope 1.1). It also covers repurposed-system application requirements (1.2) and remanufactured batteries (1.3).",
+    "note": "Scope 1.1 quoted from the UL product page. Edition 2, published 2023-11-10. The standard text itself is paywalled and was not read."
+  },
+  {
+    "id": 3,
+    "status": "VERIFIED",
+    "title": "Remaining driving range prediction for electric vehicles: Key challenges and outlook",
+    "authors": "Mei, P.; Karimi, H. R.; Huang, C.; Chen, F.; Yang, S.",
+    "venue": "IET Control Theory & Applications 17(14):1875-1893",
+    "year": 2023,
+    "url": "https://doi.org/10.1049/cth2.12486",
+    "claim": "Review of EV remaining-driving-range (RDR) prediction. Covers battery and vehicle physical models and energy-flow analysis, and names four challenges: battery state estimation, driving-behaviour classification and recognition, driving-condition and speed prediction, and the RDR calculation method. Proposes vehicle-cloud collaborative prediction.",
+    "note": "Abstract retrieved via Crossref. Every element of the claim is in the abstract."
+  },
+  {
+    "id": 4,
+    "status": "PARTIAL",
+    "title": "Sorting and grouping optimization method for second-use batteries considering aging mechanism",
+    "authors": "Jiang, T.; Sun, J.; Wang, T.; et al. (9 authors; last: Wu, X.)",
+    "venue": "Journal of Energy Storage 44:103264",
+    "year": 2021,
+    "url": "https://doi.org/10.1016/j.est.2021.103264",
+    "claim": "Retired-battery sorting using capacity, internal resistance and an ICA-based aging-mechanism indicator with fuzzy clustering. Batteries are targeted at an energy-storage scenario (high capacity) and a peak-load-shifting scenario (instantaneous high power). 80 retired LiFePO4 batteries.",
+    "note": "PII S2352152X21009592 resolves to this DOI (Crossref). Title, authors, venue and year confirmed. The abstract could not be retrieved (ScienceDirect/ResearchGate 403; not in Crossref, OpenAlex or Semantic Scholar). The claim details match only a search-engine summary of the abstract, so treat them as snippet-level. The 'energy- vs power-oriented' wording is a paraphrase of the two application scenarios."
+  },
+  {
+    "id": 5,
+    "status": "PARTIAL",
+    "title": "An enhanced sorting method for second-life lithium-ion batteries based on two-step clustering",
+    "authors": "Wan, F.; Lin, Y.; Yang, D.; et al. (8 authors; last: Chen, W.)",
+    "venue": "Journal of Cleaner Production 544:147712",
+    "year": 2026,
+    "url": "https://doi.org/10.1016/j.jclepro.2026.147712",
+    "claim": "Proposes a two-step-clustering sorting method for second-life Li-ion batteries. This is all the retrievable record supports.",
+    "note": "Existence confirmed (Crossref, OpenAlex, Elsevier API; cover date 2026-02-15). The abstract could not be retrieved anywhere. NONE of these specifics were checked: capacity features, DC resistance, temperature-rise rate, 200 batteries, 64%/80% static/dynamic consistency, 68% more reuse cycles. Targeted searches did not surface these numbers. Do not cite the numbers until read in the paper."
+  },
+  {
+    "id": 6,
+    "status": "VERIFIED",
+    "title": "Clustering recovered 18650 lithium-ion cells to improve homogeneity in second-life battery pack construction",
+    "authors": "Olivero-Ortiz, V.; Oliveros Pantoja, I.; Mendoza Polo, J.; Robles-Algarin, C.; Ripoll Solano, L.",
+    "venue": "PLOS ONE 21(7):e0353394",
+    "year": 2026,
+    "url": "https://doi.org/10.1371/journal.pone.0353394",
+    "claim": "18650 cells recovered from laptop packs were clustered on discharged capacity and internal resistance and selected iteratively. With the same topology, the refined algorithm's pack beat the baseline algorithm's: 8.98 vs 8.72 Ah, 76.38 vs 78.90 mOhm, 716.97 vs 694.08 W.",
+    "note": "Open-access abstract retrieved (Crossref/OpenAlex); published 2026-07-16. The claim is supported. Caveat: the comparison is refined vs baseline selection algorithm (one pack each), not clustering vs no clustering."
+  },
+  {
+    "id": 7,
+    "status": "PARTIAL",
+    "title": "A novel sorting method and second-life utilization strategy for retired lithium-ion batteries",
+    "authors": "Chang, L.; Du, H.; Wang, W.; Zhu, R.; Li, C.; Duan, B.",
+    "venue": "Journal of Energy Storage 147:120129",
+    "year": 2026,
+    "url": "https://doi.org/10.1016/j.est.2025.120129",
+    "claim": "Proposes a retired-battery sorting method that combines fuzzy comprehensive evaluation with K-means (FCE-KM), plus a second-life utilization strategy.",
+    "note": "Existence confirmed (Crossref, OpenAlex; cover date 2026-02-20). No abstract retrieved. The FCE + K-means method is confirmed by the SSRN preprint title (doi:10.2139/ssrn.5123912, same authors); the SSRN page returned 403. The claimed improvement over basic K-means in consistency, iterations and inertia is UNVERIFIED. A search-engine summary of the preprint gives the baseline as FCE alone (about 30.32% average consistency gain), which conflicts with the claim. Needs a full-text check."
+  },
+  {
+    "id": 8,
+    "status": "VERIFIED",
+    "title": "PNGV Battery Test Manual, Rev. 0",
+    "authors": "Idaho National Engineering Laboratory (Lockheed Idaho Technologies Co.) for U.S. DOE",
+    "venue": "Technical report DOE/ID-10597 (OSTI 578702)",
+    "year": 1997,
+    "url": "https://www.osti.gov/biblio/578702",
+    "claim": "Defines HEV battery tests, including the Hybrid Pulse Power Characterization (HPPC) test (Sec. 3.1.2 and later sections).",
+    "note": "OSTI record confirmed (July 1997). The OSTI abstract does not mention HPPC, but the OCR of the scan (UNT Digital Library, metadc691692) shows 'Rev. 0 Published July 1997' and section 3.1.2 'Hybrid Pulse Power Characterization Test'. The widely cited Rev. 3 (Feb 2001) uses the same number; it was NOT retrieved (INL returned 403). Say which revision you mean."
+  },
+  {
+    "id": 9,
+    "status": "VERIFIED",
+    "title": "A Review of the Technical Challenges and Solutions in Maximising the Potential Use of Second Life Batteries from Electric Vehicles",
+    "authors": "Salek, F.; Resalati, S.; Babaie, M.; Henshall, P.; Morrey, D.; Yao, L.",
+    "venue": "Batteries 10(3):79",
+    "year": 2024,
+    "url": "https://doi.org/10.3390/batteries10030079",
+    "claim": "Technical review of second-life battery (SLB) modelling and testing. It recommends 2RC and 3RC equivalent-circuit models for their good accuracy on second-life performance, EIS for degradation history, and electrochemical over empirical models for calendar ageing.",
+    "note": "Open-access abstract retrieved (Crossref/OpenAlex). The 2RC/3RC statement appears nearly verbatim in the abstract."
+  },
+  {
+    "id": 10,
+    "status": "PARTIAL",
+    "title": "Recent advancements in battery state of power estimation technology: A comprehensive overview and error source analysis",
+    "authors": "Guo, R.; Shen, W.",
+    "venue": "Journal of Energy Storage 103:114294",
+    "year": 2024,
+    "url": "https://doi.org/10.1016/j.est.2024.114294",
+    "claim": "SOP review covering the battery safe operating area (safety constraints from macro to micro scale), peak charge/discharge modes, battery models, SOP algorithms, and error-source and propagation analysis.",
+    "note": "Abstract and highlights retrieved (OpenAlex). The abstract says 'various safety constraints' but does not list voltage, current, SOC and temperature. That list is plausible but unchecked (full text 403)."
+  },
+  {
+    "id": 11,
+    "status": "VERIFIED",
+    "title": "Control Barrier Functions for State of Power Estimation in Lithium-Ion Battery Management",
+    "authors": "Kossek, M.; Trimboli, M. S.",
+    "venue": "ASME Journal of Dynamic Systems, Measurement, and Control 148(5):051010",
+    "year": 2026,
+    "url": "https://doi.org/10.1115/1.4071370",
+    "claim": "Uses control barrier functions for SOP estimation within a constraint set of SOC, voltage and core temperature. Demonstrated in simulation on UDDS and compared with MPC and a bisection-based method.",
+    "note": "The original ASME DOI was found via Crossref and the abstract retrieved; it supports the claim. Cite the DOI, not the yetl.yabesh.ir mirror (the mirror showed only title and journal). Caveat: simulation-only validation, per the abstract."
+  },
+  {
+    "id": 12,
+    "status": "PARTIAL",
+    "title": "Differentiable physics information neural network with equivalent circuit model constraints for lithium-ion battery parameter identification",
+    "authors": "Wang, H.; Zhao, H.",
+    "venue": "Journal of Energy Storage 155:121685",
+    "year": 2026,
+    "url": "https://doi.org/10.1016/j.est.2026.121685",
+    "claim": "A differentiable physics-informed neural network constrained by an equivalent-circuit model, for Li-ion battery parameter identification. This is all the retrievable record supports.",
+    "note": "Existence confirmed (Crossref, OpenAlex, Elsevier API; cover date 2026-04-20). No abstract retrievable. UNVERIFIED: that the ECM is 2RC, HPPC validation, and terminal-voltage MAE < 3 mV. Do not cite the 3 mV figure until read in the paper."
+  },
+  {
+    "id": 13,
+    "status": "VERIFIED",
+    "title": "A review of model-based state of power estimation for lithium-ion batteries",
+    "authors": "Lu, J.; Xiong, Y.; Wu, X.; Zhang, X.; Wu, X.; Gong, F.",
+    "venue": "Journal of Energy Storage 167:122585",
+    "year": 2026,
+    "url": "https://doi.org/10.1016/j.est.2026.122585",
+    "claim": "Review of model-based SOP estimation for Li-ion batteries.",
+    "note": "Existence and title confirmed (Crossref, OpenAlex, Elsevier API; cover date 2026-07-30). The claim is only the topic, which the title supports. The abstract was not retrievable, so no content claim can be attached."
+  },
+  {
+    "id": 14,
+    "status": "VERIFIED",
+    "title": "PyBaMM (Python Battery Mathematical Modelling) documentation, v26.8.0.0",
+    "authors": "PyBaMM Team; software paper: Sulzer, V.; Marquis, S. G.; Timms, R.; et al.",
+    "venue": "docs.pybamm.org; software paper in Journal of Open Research Software 9(1), doi:10.5334/jors.309",
+    "year": 2026,
+    "url": "https://docs.pybamm.org/",
+    "claim": "PyBaMM provides lithium-ion models (SPM, SPMe, DFN, MPM, Newman-Tobias, MSMR, others) and equivalent-circuit models (Thevenin, SplitOCVR).",
+    "note": "Checked on the models API index of the current docs (docs.pybamm.org redirects to v26.8.0.0). A context7 snippet for the Thevenin class listed nonsensical method names and was discarded. For a formal citation use Sulzer et al. 2021, JORS, doi:10.5334/jors.309 (Crossref-verified)."
+  },
+  {
+    "id": 15,
+    "status": "VERIFIED",
+    "title": "BEEP: Battery Evaluation and Early Prediction",
+    "authors": "Toyota Research Institute (TRI-AMDD)",
+    "venue": "GitHub repository (Apache-2.0)",
+    "year": 2026,
+    "url": "https://github.com/TRI-AMDD/beep",
+    "claim": "The BEEP README lists support for data from Arbin, Novonix, MACCOR, BioLogic, Neware, and Battery Archive.",
+    "note": "README checked. Not archived; last push 2026-02-09 (GitHub API). The year is the last-activity year, not a publication year."
+  },
+  {
+    "id": "fcm",
+    "status": "VERIFIED",
+    "title": "Pattern Recognition with Fuzzy Objective Function Algorithms",
+    "authors": "Bezdek, J. C.",
+    "venue": "Springer US (book)",
+    "year": 1981,
+    "url": "https://doi.org/10.1007/978-1-4757-0450-1",
+    "claim": "Standard monograph reference for fuzzy c-means (FCM).",
+    "note": "Crossref-verified. Alternative journal reference: Bezdek, Ehrlich & Full (1984), 'FCM: The fuzzy c-means clustering algorithm', Computers & Geosciences 10(2-3):191-203, doi:10.1016/0098-3004(84)90020-7 (Crossref-verified). Full texts not read."
+  },
+  {
+    "id": "xb",
+    "status": "VERIFIED",
+    "title": "A validity measure for fuzzy clustering",
+    "authors": "Xie, X. L.; Beni, G.",
+    "venue": "IEEE Transactions on Pattern Analysis and Machine Intelligence 13(8):841-847",
+    "year": 1991,
+    "url": "https://doi.org/10.1109/34.85677",
+    "claim": "Original source of the Xie-Beni fuzzy-cluster validity index.",
+    "note": "Crossref-verified metadata. Full text not read."
+  },
+  {
+    "id": "lof",
+    "status": "VERIFIED",
+    "title": "LOF: identifying density-based local outliers",
+    "authors": "Breunig, M. M.; Kriegel, H.-P.; Ng, R. T.; Sander, J.",
+    "venue": "Proceedings of the 2000 ACM SIGMOD International Conference on Management of Data, pp. 93-104",
+    "year": 2000,
+    "url": "https://doi.org/10.1145/342009.335388",
+    "claim": "Introduces the local outlier factor (LOF), a degree of outlierness based on isolation relative to the local neighbourhood.",
+    "note": "Crossref title and subtitle checked; the abstract (OpenAlex) defines LOF."
+  },
+  {
+    "id": "wilson",
+    "status": "VERIFIED",
+    "title": "Probable Inference, the Law of Succession, and Statistical Inference",
+    "authors": "Wilson, E. B.",
+    "venue": "Journal of the American Statistical Association 22(158):209-212",
+    "year": 1927,
+    "url": "https://doi.org/10.1080/01621459.1927.10502953",
+    "claim": "Original source of the Wilson score interval for a binomial proportion.",
+    "note": "Crossref-verified metadata. Full text not read. Attributing the score interval to this paper is standard background, not checked against the text."
+  }
+]

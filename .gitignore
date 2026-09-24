@@ -1,0 +1,20 @@
+# environments / builds
+backend/.venv/
+**/__pycache__/
+frontend/node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# runtime data (recorded sessions, raw bus captures, write audit, local state)
+backend/data/*
+!backend/data/.gitkeep
+!backend/data/recordings/
+backend/data/recordings/*
+!backend/data/recordings/.gitkeep
+!backend/data/sessions/
+backend/data/sessions/*
+!backend/data/sessions/.gitkeep
+
+# local editor / OS
+.DS_Store
+Thumbs.db
