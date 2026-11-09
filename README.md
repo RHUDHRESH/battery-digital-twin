@@ -6,6 +6,8 @@ The battery is the hero: a live 3D model that opens up to its cells, with curren
 
 The demo battery can be 1, 4, 8 or 16 cells. Pick the size on the start screen.
 
+**Stack:** Python 3.12+ (FastAPI, uvicorn, NumPy, SciPy, scikit-learn, pandas, pyserial) · React 19, Vite 8, TypeScript, React Three Fiber (three.js), Recharts
+
 ## Set up (first time)
 
 Requires Python 3.12+ and Node 20+.
@@ -61,7 +63,7 @@ Writes (MOSFET commands and the raw hex console with a checksum helper) need **W
 
 The twin (`backend/bdt/model/livetwin.py`) is a per-cell 2RC model driven by the measured current. It uses the measured temperature and is nudged slowly toward the BMS SOC. After 5 minutes of rest it learns a correction to the generic LFP OCV table, pack-wide in 5 % SOC bins. It learns one pack-wide correction rather than one per cell, so real cell imbalance stays visible in the per-cell bias chart.
 
-Known limit: forecasts treat all cells as identical until per-cell parameters are identified from load steps, so the cell a forecast names as failing first is not yet meaningful.
+Next: identify per-cell parameters from load steps so forecasts name the exact cell that will fail first (today every cell shares one parameter set).
 
 ## What is in here
 
@@ -83,3 +85,7 @@ Known limit: forecasts treat all cells as identical until per-cell parameters ar
 Checked in demo mode against the simulator's ground truth: τ₁ within 1 %, R₁ within 7 %, τ₂ within 5 %, DCIR_1s within 5 %, and the weak cell identified correctly.
 This checks the estimator's logic. It is **not** validation against real hardware.
 No score in this tool has been validated against real vehicle missions yet.
+
+---
+
+Built by [Rhudhresh R](https://github.com/RHUDHRESH).
